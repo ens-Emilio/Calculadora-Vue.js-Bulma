@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Vue.js + Bulma</title>
+  <!-- Bulma CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Vue.js -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body :class="theme">
+  <div id="app">
+    <div class="calculator box" :class="theme">
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <strong class="is-size-4 calculator-title">Calculadora</strong>
+        <div class="select is-small">
+          <select v-model="theme" title="Trocar tema">
+            <option value="theme-light">Claro</option>
+            <option value="theme-dark">Escuro</option>
+            <option value="theme-color">Colorido</option>
+          </select>
+        </div>
+      </div>
+      <div class="history-panel mb-3" v-if="history.length">
+        <div class="is-flex is-justify-content-space-between is-align-items-center mb-1">
+          <strong>Histórico</strong>
+          <button class="button is-small is-danger is-outlined history-clear-btn" @click="clearHistory" title="Limpar histórico">
+            <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            <span>Limpar</span>
+          </button>
+        </div>
+        <ul style="max-height: 120px; overflow-y: auto;">
+          <li v-for="(item, idx) in history.slice().reverse()" :key="idx">
+            <a href="#" @click.prevent="reuseResult(item)" title="Usar este resultado">{{ item }}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="operation is-flex is-justify-content-space-between is-align-items-center" v-if="operationDisplay || lastResult">
+        <span class="has-text-grey">{{ operationDisplay }}</span>
+        <span v-if="lastResult" class="has-text-grey-light is-size-7">Anterior: {{ lastResult }}</span>
+      </div>
+      <div class="display" :class="{ error, animate: animateDisplay }">
+        {{ display }}
+        <button v-if="!error" class="button is-small is-light ml-2" @click="copyResult" title="Copiar resultado">
+          <span class="icon is-small"><i class="fas fa-copy"></i></span>
+        </button>
+      </div>
+      <div class="columns is-mobile mb-2">
+        <div class="column is-one-quarter" v-for="mem in memoryButtons" :key="mem.text">
+          <button
+            class="button is-small is-fullwidth"
+            :title="mem.title"
+            @click="press(mem.text)"
+          >
+            {{ mem.text }}
+          </button>
+        </div>
+      </div>
+      <div class="calculator-grid">
+        <div class="numbers-grid">
+          <button v-for="btn in gridButtons" :key="btn.text"
+            :class="[
+              'button', 'is-large', 'calc-btn',
+              btn.type ? 'is-' + btn.type : '',
+              activeOperator === btn.text && btn.type === 'info' ? 'active-operator' : '',
+              pressedButton === btn.text ? 'pressed' : ''
+            ]"
+            :style="btn.style || ''"
+            @click="press(btn.text)">
+            {{ btn.text }}
+          </button>
+        </div>
+        <div class="operators-col">
+          <button class="button is-large is-info calc-btn" :class="[pressedButton === '%' ? 'pressed' : '']" @click="press('%')">%</button>
+          <button class="button is-large is-info calc-btn" :class="[activeOperator === '/' ? 'active-operator' : '']" @click="press('/')">/</button>
+          <button class="button is-large is-info calc-btn" :class="[activeOperator === '*' ? 'active-operator' : '']" @click="press('*')">*</button>
+          <button class="button is-large is-info calc-btn" :class="[activeOperator === '-' ? 'active-operator' : '']" @click="press('-')">-</button>
+          <button class="button is-large is-info calc-btn" :class="[activeOperator === '+' ? 'active-operator' : '']" @click="press('+')">+</button>
+          <button class="button is-large is-success calc-btn" :class="[pressedButton === '=' ? 'pressed' : '']" @click="press('=')">=</button>
+          <button class="button is-large is-danger calc-btn" :class="[pressedButton === 'C' ? 'pressed' : '']" @click="press('C')">C</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
