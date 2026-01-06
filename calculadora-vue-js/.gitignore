@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.idea/
+.vscode/
+*.log
+.env
+/.DS_Store
+/.pnpm-debug.log*
